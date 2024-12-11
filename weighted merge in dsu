@@ -1,0 +1,217 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+// macros :
+#define lp(i,m,n) for(int i=m;i<n;i++)
+#define ll long long
+#define pb push_back
+#define mp make_pair
+#define f first
+#define s second
+#define all(x) x.begin() , x.end()
+#define sortall(x) sort(all(x))
+#define tr(it ,a) for(auto it =a.begin() ; it!=a.end() ;it++)
+#define inv(vec,m,n) lp(i,m,n){ int temp ; cin>>temp;vec.pb(temp);}
+#define ina(arr,m,n) lp(i,m,n){cin>>arr[i];}
+#define int long long
+#define INF 100000000
+
+mt19937_64 RNG(chrono::steady_clock::now().time_since_epoch().count());
+// typedef :
+typedef pair<int ,int>        pii;
+typedef pair<long ,long >     pll;
+typedef vector<int>           vi;
+typedef vector<ll>            vl;
+typedef vector<pii>           vpii;
+typedef vector<pll>           vpll;
+typedef vector<vi>            vvi;
+typedef vector<vl>            vvl;
+
+
+bool flag1=0;
+bool flag2=0;
+bool flag3=0;
+int mod=1e9+7;
+
+
+class DSU{
+     
+  vector<int>size,parent,value;
+
+   vector<vector<int>>graph;
+
+  public:
+     
+    DSU(int n){
+          
+       size.resize(n+1,1);
+
+       parent.resize(n+1);
+
+       value.resize(n+1);
+
+       graph.resize(n+1);
+
+       for(int i=0;i<=n;i++) parent[i]=i;
+      
+    }
+    
+    int find(int x){
+         
+         if(parent[x]==x){
+            return x;
+         }
+
+         return parent[x]=find(parent[x]);    // path compression
+    }
+
+    void dfs(int curr,int par,int diff){
+         
+        value[curr]+=diff;
+         
+        for(auto u:graph[curr]){
+             
+             if(u==par){
+                continue;
+             }
+
+            dfs(u,curr,diff);
+        }
+
+
+    }
+
+
+   void merge(int x,int y,int val){
+     
+       int rootx=find(x);
+       int rooty=find(y);
+
+     if(rootx==rooty){
+        return;
+     }
+
+     if(size[rootx]>=size[rooty]){
+           
+       int diff=value[x]-value[y];
+
+        diff-=val;
+
+        size[rootx]+=size[rooty];
+         
+        dfs(rooty,-1,diff);
+
+        parent[rooty]=rootx;
+        
+     }
+
+     else{
+          
+         int  diff=value[y]-value[x];
+          diff+=val;
+
+          size[rooty]+=size[rootx];
+
+           dfs(rootx,-1,diff);
+
+             parent[rootx]=rooty;
+
+
+    
+     }
+
+       graph[x].push_back(y);
+       graph[y].push_back(x);
+
+
+
+        
+   }
+
+
+   int value1(int x,int y){
+      
+       int rootx=find(x);
+       int rooty=find(y);
+        
+      if(rootx!=rooty){
+
+        return INF;
+      }
+
+     else{
+         
+          return value[x]-value[y];
+     }
+   }
+
+
+
+     
+
+
+};
+
+
+
+
+void solve()
+{
+  int n,q;
+  cin>>n>>q;
+
+  DSU ds(n);
+
+  while(q--){
+
+    int type;cin>>type;
+     
+     if(type==0){
+
+        int a,b,c;
+         
+        cin>>a>>b>>c;
+
+         ds.merge(a,b,c);
+     }
+
+    else{
+   
+       int x,y;
+       cin>>x>>y;
+          
+
+        int ans=ds.value1(x,y);   
+
+        if(ans==INF){
+
+            cout<<'?'<<"\n";
+
+            
+        }
+        else{
+            cout<<ans<<"\n";
+        }
+        
+    }
+  }
+  
+    
+}
+
+
+signed main()
+{
+auto begin = std::chrono::high_resolution_clock::now();
+ios_base::sync_with_stdio(false);
+cin.tie(NULL);
+int t=1;
+//cin>>t;
+while(t--)
+{
+solve();
+}
+ auto end = std::chrono::high_resolution_clock::now();
+auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+return 0;
+}
